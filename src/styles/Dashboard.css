@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Dashboard Styles
+   ========================================================================== */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-left-width: 5px !important;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 100%);
+  pointer-events: none;
+}
+
+.text-indigo {
+  color: #6366f1 !important;
+}
+
+.bg-indigo-subtle {
+  background-color: #eef2ff !important;
+}
+
+/* Quick Action Cards */
+.quick-action-btn {
+  transition: all 0.2s ease-in-out;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+
+.quick-action-btn:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Chart Canvas Container */
+.chart-container {
+  position: relative;
+  width: 100%;
+}

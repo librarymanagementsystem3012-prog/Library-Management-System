@@ -1,0 +1,92 @@
+/* ==========================================================================
+   Library Management System - Master App Stylesheet
+   ========================================================================== */
+
+/* Import Feature Stylesheets */
+@import './styles/Navbar.css';
+@import './styles/Sidebar.css';
+@import './styles/Dashboard.css';
+@import './styles/Books.css';
+@import './styles/IssueReturn.css';
+@import './styles/statistics.css';
+
+/* ==========================================================================
+   Login Page Styling
+   ========================================================================== */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top right, #eef2ff, #f8fafc 60%);
+  padding: 24px;
+}
+
+.login-card {
+  max-width: 440px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xl);
+  padding: 36px 32px;
+}
+
+.login-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 16px auto;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+}
+
+/* ==========================================================================
+   Global Helper & Utility Classes
+   ========================================================================== */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.letter-spacing-sm {
+  letter-spacing: 0.05em;
+}
+
+.fw-semi {
+  font-weight: 600;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.85rem;
+}
+
+/* Smooth Focus Rings */
+a, button, input, select, textarea {
+  outline: none;
+}
+
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Table Card Wrapper */
+.table-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Toast & Alert Animations */
+.alert {
+  border-radius: var(--radius-sm);
+  border-width: 1px;
+}

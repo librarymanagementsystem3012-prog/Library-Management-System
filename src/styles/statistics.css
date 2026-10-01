@@ -1,0 +1,32 @@
+/* ==========================================================================
+   Statistics & Analytics Styles
+   ========================================================================== */
+.stats-highlight-card {
+  border-radius: var(--radius-md);
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+}
+
+.stats-highlight-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.stats-metric-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.stats-trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 9999px;
+}

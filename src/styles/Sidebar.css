@@ -1,0 +1,131 @@
+/* ==========================================================================
+   Sidebar Styles
+   ========================================================================== */
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-normal);
+  z-index: 1010;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  padding: 24px 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #60a5fa;
+  text-transform: uppercase;
+}
+
+.sidebar-brand i {
+  font-size: 1.45rem;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 18px 14px;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-menu-item {
+  width: 100%;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: var(--transition-fast);
+}
+
+.sidebar-link i {
+  font-size: 1.15rem;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: var(--sidebar-hover);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.sidebar-link:hover i {
+  color: #60a5fa;
+}
+
+.sidebar-link.active {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.sidebar-link.active i {
+  color: #ffffff;
+}
+
+/* Sidebar Footer Badge */
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.8rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Responsive Sidebar for smaller viewports */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+  .sidebar-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 6px;
+  }
+  .sidebar-menu-item {
+    width: auto;
+    flex: 1 1 calc(50% - 6px);
+  }
+  .sidebar-link {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    justify-content: center;
+  }
+}
