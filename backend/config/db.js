@@ -7,18 +7,22 @@ dotenv.config({ path: path.join(__dirname, '../../../.env') });
 dotenv.config();
 
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'library_management',
+  host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10),
+  user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
+  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '',
+  database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'library_management',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  dateStrings: true
+  dateStrings: true,
+  connectTimeout: 10000,
+  ...(process.env.DB_SSL === 'true' || process.env.MYSQL_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {})
 };
 
 let rawPool = null;
 let isConnected = false;
+let isInitializing = false;
 
 // Fallback in-memory dataset to ensure zero-crash robustness if MySQL password is not yet entered in .env
 let fallbackStore = {
@@ -53,25 +57,9 @@ let fallbackStore = {
   ]
 };
 
-// Initialize MySQL Database connection
-async function initializeDatabase() {
+// Helper to auto-create tables and populate initial seed data
+async function ensureTablesAndSeed(conn) {
   try {
-    const adminConnection = await mysql.createConnection({
-      host: dbConfig.host,
-      user: dbConfig.user,
-      password: dbConfig.password,
-      connectTimeout: 3000
-    });
-
-    await adminConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-    await adminConnection.end();
-
-    rawPool = mysql.createPool(dbConfig);
-    const conn = await rawPool.getConnection();
-    isConnected = true;
-    console.log(`✅ Successfully connected to MySQL database: ${dbConfig.database}`);
-
-    // Create tables
     await conn.query(`
       CREATE TABLE IF NOT EXISTS books (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -139,7 +127,6 @@ async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
-    // Check if sample data needed
     const [rows] = await conn.query('SELECT COUNT(*) as count FROM books');
     if (rows[0].count === 0) {
       console.log('🌱 Seeding initial sample books and students into MySQL...');
@@ -169,21 +156,64 @@ async function initializeDatabase() {
       }
       console.log('✅ Initial database tables and sample data populated.');
     }
+  } catch (schemaErr) {
+    console.warn(`⚠️ Notice during table check: ${schemaErr.message}`);
+  }
+}
 
-    conn.release();
-    return true;
+// Initialize MySQL Database connection
+async function initializeDatabase() {
+  if (isInitializing) return isConnected;
+  isInitializing = true;
+
+  try {
+    // If DB_PASSWORD or MYSQLPASSWORD is provided, try direct connection first
+    try {
+      rawPool = mysql.createPool(dbConfig);
+      const conn = await rawPool.getConnection();
+      isConnected = true;
+      console.log(`✅ Successfully connected to MySQL database: ${dbConfig.database} (${dbConfig.host}:${dbConfig.port})`);
+      await ensureTablesAndSeed(conn);
+      conn.release();
+      return true;
+    } catch (directErr) {
+      // If error is database not found, try creating it (local development fallback)
+      if (directErr.code === 'ER_BAD_DB_ERROR') {
+        const adminConnection = await mysql.createConnection({
+          host: dbConfig.host,
+          port: dbConfig.port,
+          user: dbConfig.user,
+          password: dbConfig.password,
+          connectTimeout: 5000
+        });
+        await adminConnection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+        await adminConnection.end();
+
+        rawPool = mysql.createPool(dbConfig);
+        const conn = await rawPool.getConnection();
+        isConnected = true;
+        console.log(`✅ Created and connected to MySQL database: ${dbConfig.database}`);
+        await ensureTablesAndSeed(conn);
+        conn.release();
+        return true;
+      }
+      throw directErr;
+    }
   } catch (err) {
     console.error(`❌ MySQL Connection Notice: ${err.message}`);
-    console.log(`👉 To connect real MySQL: Enter DB_PASSWORD in backend/.env with your local MySQL root password.`);
-    console.log(`💡 The backend will run in self-contained resilient mode until MySQL credentials are configured.`);
     isConnected = false;
     return false;
+  } finally {
+    isInitializing = false;
   }
 }
 
 // Resilient Pool Proxy: Delegates to real MySQL pool if available, else executes against structured in-memory store
 const pool = {
   async query(sql, params = []) {
+    if (!isConnected && (process.env.DB_PASSWORD || process.env.MYSQLPASSWORD)) {
+      await initializeDatabase();
+    }
     if (isConnected && rawPool) {
       return await rawPool.query(sql, params);
     }
@@ -191,6 +221,9 @@ const pool = {
   },
 
   async getConnection() {
+    if (!isConnected && (process.env.DB_PASSWORD || process.env.MYSQLPASSWORD)) {
+      await initializeDatabase();
+    }
     if (isConnected && rawPool) {
       return await rawPool.getConnection();
     }
