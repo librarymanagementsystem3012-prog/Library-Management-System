@@ -27,34 +27,18 @@ let isInitializing = false;
 // Fallback in-memory dataset to ensure zero-crash robustness if MySQL password is not yet entered in .env
 let fallbackStore = {
   books: [
-    { id: 1, book_name: 'Java Programming', author: 'James Gosling & Herbert Schildt', category: 'Computer Science', total_quantity: 10, available_quantity: 8, issued_quantity: 2, created_at: '2026-09-01 10:00:00' },
-    { id: 2, book_name: 'React JS - Modern Web Development', author: 'Dan Abramov & Sophie Alpert', category: 'Web Development', total_quantity: 8, available_quantity: 7, issued_quantity: 1, created_at: '2026-09-02 10:00:00' },
+    { id: 1, book_name: 'Java Programming', author: 'James Gosling & Herbert Schildt', category: 'Computer Science', total_quantity: 10, available_quantity: 10, issued_quantity: 0, created_at: '2026-09-01 10:00:00' },
+    { id: 2, book_name: 'React JS - Modern Web Development', author: 'Dan Abramov & Sophie Alpert', category: 'Web Development', total_quantity: 8, available_quantity: 8, issued_quantity: 0, created_at: '2026-09-02 10:00:00' },
     { id: 3, book_name: 'Spring Boot in Action', author: 'Craig Walls', category: 'Backend Development', total_quantity: 6, available_quantity: 6, issued_quantity: 0, created_at: '2026-09-03 10:00:00' },
-    { id: 4, book_name: 'Python Programming: A Modern Approach', author: 'Guido van Rossum & John Zelle', category: 'Data Science & AI', total_quantity: 12, available_quantity: 11, issued_quantity: 1, created_at: '2026-09-04 10:00:00' },
-    { id: 5, book_name: 'Database Management Systems', author: 'Raghu Ramakrishnan & Johannes Gehrke', category: 'Database Systems', total_quantity: 15, available_quantity: 14, issued_quantity: 1, created_at: '2026-09-05 10:00:00' },
+    { id: 4, book_name: 'Python Programming: A Modern Approach', author: 'Guido van Rossum & John Zelle', category: 'Data Science & AI', total_quantity: 12, available_quantity: 12, issued_quantity: 0, created_at: '2026-09-04 10:00:00' },
+    { id: 5, book_name: 'Database Management Systems', author: 'Raghu Ramakrishnan & Johannes Gehrke', category: 'Database Systems', total_quantity: 15, available_quantity: 15, issued_quantity: 0, created_at: '2026-09-05 10:00:00' },
     { id: 6, book_name: 'Operating System Concepts', author: 'Abraham Silberschatz & Peter Baer Galvin', category: 'Computer Science', total_quantity: 7, available_quantity: 7, issued_quantity: 0, created_at: '2026-09-06 10:00:00' },
     { id: 7, book_name: 'Computer Networks', author: 'Andrew S. Tanenbaum', category: 'Networking', total_quantity: 9, available_quantity: 9, issued_quantity: 0, created_at: '2026-09-07 10:00:00' },
     { id: 8, book_name: 'Data Structures and Algorithms in C++', author: 'Adam Drozdek', category: 'Algorithms', total_quantity: 10, available_quantity: 10, issued_quantity: 0, created_at: '2026-09-08 10:00:00' }
   ],
-  students: [
-    { id: 1, student_name: 'Swetha Sharma', email: 'swetha@example.com', phone_number: '9876543210', created_at: '2026-09-01 10:00:00' },
-    { id: 2, student_name: 'Rahul Verma', email: 'rahul.verma@example.com', phone_number: '9812345678', created_at: '2026-09-02 10:00:00' },
-    { id: 3, student_name: 'Priya Patel', email: 'priya.patel@example.com', phone_number: '9898765432', created_at: '2026-09-03 10:00:00' },
-    { id: 4, student_name: 'Ananya Roy', email: 'ananya.roy@example.com', phone_number: '9711223344', created_at: '2026-09-04 10:00:00' },
-    { id: 5, student_name: 'Vikram Singh', email: 'vikram.singh@example.com', phone_number: '9655443322', created_at: '2026-09-05 10:00:00' }
-  ],
-  issues: [
-    { id: 1, student_id: 1, book_id: 1, issue_date: '2026-09-10', due_date: '2026-09-24', return_date: null, status: 'Issued', fine: '0.00', created_at: '2026-09-10 10:00:00' },
-    { id: 2, student_id: 2, book_id: 2, issue_date: '2026-09-20', due_date: '2026-09-29', return_date: null, status: 'Issued', fine: '0.00', created_at: '2026-09-20 11:30:00' },
-    { id: 3, student_id: 3, book_id: 4, issue_date: '2026-09-22', due_date: '2026-10-06', return_date: null, status: 'Issued', fine: '0.00', created_at: '2026-09-22 14:15:00' },
-    { id: 4, student_id: 4, book_id: 5, issue_date: '2026-09-23', due_date: '2026-10-07', return_date: null, status: 'Issued', fine: '0.00', created_at: '2026-09-23 09:40:00' },
-    { id: 5, student_id: 5, book_id: 1, issue_date: '2026-09-01', due_date: '2026-09-15', return_date: '2026-09-18', status: 'Returned', fine: '150.00', created_at: '2026-09-01 10:00:00' }
-  ],
-  notifications: [
-    { id: 1, student_id: 1, issue_id: 1, email: 'swetha@example.com', notification_type: 'Book Issued', subject: 'Library Book Issued - Java Programming', message: 'Dear Swetha Sharma,\n\nThe following book has been issued to you:\n\nBook: Java Programming\nAuthor: James Gosling & Herbert Schildt\nIssue Date: 2026-09-10\nDue Date: 2026-09-24\n\nPlease return the book on or before the due date.\n\nThank you,\nLibrary Management System', status: 'Sent', sent_at: '2026-09-10 10:00:00' },
-    { id: 2, student_id: 2, issue_id: 2, email: 'rahul.verma@example.com', notification_type: 'Book Issued', subject: 'Library Book Issued - React JS - Modern Web Development', message: 'Dear Rahul Verma,\n\nThe following book has been issued to you:\n\nBook: React JS - Modern Web Development\nAuthor: Dan Abramov & Sophie Alpert\nIssue Date: 2026-09-20\nDue Date: 2026-09-29\n\nPlease return the book on or before the due date.\n\nThank you,\nLibrary Management System', status: 'Sent', sent_at: '2026-09-20 11:30:00' },
-    { id: 3, student_id: 5, issue_id: 5, email: 'vikram.singh@example.com', notification_type: 'Book Returned', subject: 'Library Book Returned - Java Programming', message: 'Dear Vikram Singh,\n\nYour book has been successfully returned.\n\nBook: Java Programming\nReturn Date: 2026-09-18\nDue Date: 2026-09-15\nFine: ₹150.00\n\nThank you,\nLibrary Management System', status: 'Sent', sent_at: '2026-09-18 15:45:00' }
-  ]
+  students: [],
+  issues: [],
+  notifications: []
 };
 
 // Helper to auto-create tables and populate initial seed data
@@ -129,32 +113,23 @@ async function ensureTablesAndSeed(conn) {
 
     const [rows] = await conn.query('SELECT COUNT(*) as count FROM books');
     if (rows[0].count === 0) {
-      console.log('🌱 Seeding initial sample books and students into MySQL...');
+      console.log('🌱 Seeding initial library books catalog into MySQL...');
       for (const b of fallbackStore.books) {
         await conn.query(
           'INSERT INTO books (id, book_name, author, category, total_quantity, available_quantity, issued_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)',
           [b.id, b.book_name, b.author, b.category, b.total_quantity, b.available_quantity, b.issued_quantity]
         );
       }
-      for (const s of fallbackStore.students) {
-        await conn.query(
-          'INSERT INTO students (id, student_name, email, phone_number) VALUES (?, ?, ?, ?)',
-          [s.id, s.student_name, s.email, s.phone_number]
-        );
-      }
-      for (const i of fallbackStore.issues) {
-        await conn.query(
-          'INSERT INTO issues (id, student_id, book_id, issue_date, due_date, return_date, status, fine) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [i.id, i.student_id, i.book_id, i.issue_date, i.due_date, i.return_date, i.status, i.fine]
-        );
-      }
-      for (const n of fallbackStore.notifications) {
-        await conn.query(
-          'INSERT INTO notifications (id, student_id, issue_id, email, notification_type, subject, message, status, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          [n.id, n.student_id, n.issue_id, n.email, n.notification_type, n.subject, n.message, n.status, n.sent_at]
-        );
-      }
-      console.log('✅ Initial database tables and sample data populated.');
+      console.log('✅ Initial books catalog populated.');
+    }
+
+    // Automatically remove legacy sample students, issues, and notifications with @example.com
+    try {
+      await conn.query("DELETE FROM notifications WHERE email LIKE '%@example.com'");
+      await conn.query("DELETE FROM issues WHERE student_id IN (SELECT id FROM students WHERE email LIKE '%@example.com')");
+      await conn.query("DELETE FROM students WHERE email LIKE '%@example.com'");
+    } catch (cleanErr) {
+      // Ignore if already clean
     }
   } catch (schemaErr) {
     console.warn(`⚠️ Notice during table check: ${schemaErr.message}`);
@@ -404,7 +379,7 @@ function executeSimulatedQuery(sql, params = []) {
         ...iss,
         issue_id: iss.id,
         student_name: s.student_name || 'Student',
-        email: s.email || 'student@example.com',
+        email: s.email || '',
         phone_number: s.phone_number || '',
         book_name: b.book_name || 'Book',
         author: b.author || 'Author',

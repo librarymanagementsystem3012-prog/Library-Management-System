@@ -57,7 +57,7 @@ async function addStudent(req, res) {
       return res.status(400).json({ success: false, message: 'Email address is required' });
     }
     if (!EMAIL_REGEX.test(email.trim())) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid email address (e.g. swetha@example.com)' });
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address (e.g. student@college.edu)' });
     }
     if (!phone_number || !phone_number.trim()) {
       return res.status(400).json({ success: false, message: 'Phone number is required' });

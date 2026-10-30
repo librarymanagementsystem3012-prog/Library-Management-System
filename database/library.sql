@@ -95,38 +95,16 @@ CREATE TABLE `notifications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ==========================================================
--- Sample Data Insertion
+-- Initial Library Books Data
 -- ==========================================================
 
--- Insert Sample Books
+-- Insert Books Catalog (Available quantity equals total quantity initially)
 INSERT INTO `books` (`id`, `book_name`, `author`, `category`, `total_quantity`, `available_quantity`, `issued_quantity`) VALUES
-(1, 'Java Programming', 'James Gosling & Herbert Schildt', 'Computer Science', 10, 8, 2),
-(2, 'React JS - Modern Web Development', 'Dan Abramov & Sophie Alpert', 'Web Development', 8, 7, 1),
+(1, 'Java Programming', 'James Gosling & Herbert Schildt', 'Computer Science', 10, 10, 0),
+(2, 'React JS - Modern Web Development', 'Dan Abramov & Sophie Alpert', 'Web Development', 8, 8, 0),
 (3, 'Spring Boot in Action', 'Craig Walls', 'Backend Development', 6, 6, 0),
-(4, 'Python Programming: A Modern Approach', 'Guido van Rossum & John Zelle', 'Data Science & AI', 12, 11, 1),
-(5, 'Database Management Systems', 'Raghu Ramakrishnan & Johannes Gehrke', 'Database Systems', 15, 14, 1),
+(4, 'Python Programming: A Modern Approach', 'Guido van Rossum & John Zelle', 'Data Science & AI', 12, 12, 0),
+(5, 'Database Management Systems', 'Raghu Ramakrishnan & Johannes Gehrke', 'Database Systems', 15, 15, 0),
 (6, 'Operating System Concepts', 'Abraham Silberschatz & Peter Baer Galvin', 'Computer Science', 7, 7, 0),
 (7, 'Computer Networks', 'Andrew S. Tanenbaum', 'Networking', 9, 9, 0),
 (8, 'Data Structures and Algorithms in C++', 'Adam Drozdek', 'Algorithms', 10, 10, 0);
-
--- Insert Sample Students
-INSERT INTO `students` (`id`, `student_name`, `email`, `phone_number`) VALUES
-(1, 'Swetha Sharma', 'swetha@example.com', '9876543210'),
-(2, 'Rahul Verma', 'rahul.verma@example.com', '9812345678'),
-(3, 'Priya Patel', 'priya.patel@example.com', '9898765432'),
-(4, 'Ananya Roy', 'ananya.roy@example.com', '9711223344'),
-(5, 'Vikram Singh', 'vikram.singh@example.com', '9655443322');
-
--- Insert Sample Issues (including an overdue one for testing fine calculation)
-INSERT INTO `issues` (`id`, `student_id`, `book_id`, `issue_date`, `due_date`, `return_date`, `status`, `fine`) VALUES
-(1, 1, 1, '2026-09-10', '2026-09-24', NULL, 'Issued', 0.00), -- Overdue active issue
-(2, 2, 2, '2026-09-20', '2026-09-29', NULL, 'Issued', 0.00), -- Approaching due date
-(3, 3, 4, '2026-09-22', '2026-10-06', NULL, 'Issued', 0.00), -- Active issue
-(4, 4, 5, '2026-09-23', '2026-10-07', NULL, 'Issued', 0.00), -- Active issue
-(5, 5, 1, '2026-09-01', '2026-09-15', '2026-09-18', 'Returned', 150.00); -- Past returned with ₹150 fine (3 days overdue)
-
--- Insert Sample Notifications
-INSERT INTO `notifications` (`id`, `student_id`, `issue_id`, `email`, `notification_type`, `subject`, `message`, `status`, `sent_at`) VALUES
-(1, 1, 1, 'swetha@example.com', 'Book Issued', 'Library Book Issued - Java Programming', 'Dear Swetha Sharma,\n\nThe following book has been issued to you:\n\nBook: Java Programming\nAuthor: James Gosling & Herbert Schildt\nIssue Date: 2026-09-10\nDue Date: 2026-09-24\n\nPlease return the book on or before the due date.\n\nThank you,\nLibrary Management System', 'Sent', '2026-09-10 10:00:00'),
-(2, 2, 2, 'rahul.verma@example.com', 'Book Issued', 'Library Book Issued - React JS - Modern Web Development', 'Dear Rahul Verma,\n\nThe following book has been issued to you:\n\nBook: React JS - Modern Web Development\nAuthor: Dan Abramov & Sophie Alpert\nIssue Date: 2026-09-20\nDue Date: 2026-09-29\n\nPlease return the book on or before the due date.\n\nThank you,\nLibrary Management System', 'Sent', '2026-09-20 11:30:00'),
-(3, 5, 5, 'vikram.singh@example.com', 'Book Returned', 'Library Book Returned - Java Programming', 'Dear Vikram Singh,\n\nYour book has been successfully returned.\n\nBook: Java Programming\nReturn Date: 2026-09-18\nDue Date: 2026-09-15\nFine: ₹150.00\n\nThank you,\nLibrary Management System', 'Sent', '2026-09-18 15:45:00');

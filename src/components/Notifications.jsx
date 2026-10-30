@@ -591,7 +591,7 @@ const Notifications = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="e.g. Swetha Sharma"
+                        placeholder="e.g. Student Name"
                         value={emailForm.studentName}
                         onChange={(e) => setEmailForm({ ...emailForm, studentName: e.target.value })}
                       />

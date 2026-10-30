@@ -48,7 +48,7 @@ const StudentManager = () => {
     if (!data.email.trim()) {
       errors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
-      errors.email = 'Please enter a valid email format (e.g. swetha@example.com)';
+      errors.email = 'Please enter a valid email format (e.g. student@college.edu)';
     }
     if (!data.phone_number.trim()) {
       errors.phone_number = 'Phone number is required';
@@ -185,7 +185,7 @@ const StudentManager = () => {
                 <input
                   type="text"
                   className={`form-control ${formErrors.student_name ? 'is-invalid' : ''}`}
-                  placeholder="e.g. Swetha Sharma"
+                  placeholder="e.g. Student Name"
                   value={newStudent.student_name}
                   onChange={(e) => setNewStudent({ ...newStudent, student_name: e.target.value })}
                 />
@@ -197,7 +197,7 @@ const StudentManager = () => {
                 <input
                   type="email"
                   className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
-                  placeholder="e.g. swetha@example.com"
+                  placeholder="e.g. student@college.edu"
                   value={newStudent.email}
                   onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
                 />
