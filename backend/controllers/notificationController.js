@@ -280,8 +280,8 @@ async function handleTestEmail(req, res) {
       return res.status(200).json({
         success: true,
         message: result.simulated
-          ? 'Test email simulated successfully. (To send real Gmail, configure EMAIL_USER and EMAIL_PASSWORD in backend/.env)'
-          : 'Test email sent successfully via Gmail SMTP!'
+          ? 'Test email simulated successfully. (To send real emails, configure EMAIL_USER and EMAIL_PASSWORD in .env)'
+          : 'Test email sent successfully via Brevo SMTP!'
       });
     } else {
       return res.status(500).json({

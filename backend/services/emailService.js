@@ -162,6 +162,12 @@ async function sendMail({ to, subject, text, html = null, type = 'General', stud
     return { success: true, simulated: false, messageId: info.messageId };
   } catch (error) {
     console.error(`❌ Email dispatch error to ${to}:`, error.message);
+    
+    let descriptiveError = error.message;
+    if (error.message.includes('535') || error.message.includes('Authentication failed')) {
+      descriptiveError = 'Brevo Authentication Failed (535 5.7.8): Brevo rejected your credentials. In Brevo (app.brevo.com/settings/keys/smtp), verify: 1) The exact "Login" shown on the SMTP tab (often in the format 1234567@smtp-brevo.com or your account email), 2) A generated SMTP key from the SMTP tab (not an API key), and 3) That your Brevo account confirmation email was verified.';
+    }
+
     await logNotification({
       studentId,
       issueId,
@@ -171,7 +177,7 @@ async function sendMail({ to, subject, text, html = null, type = 'General', stud
       message: text,
       status: 'Failed'
     });
-    return { success: false, simulated: false, error: error.message };
+    return { success: false, simulated: false, error: descriptiveError };
   }
 }
 
