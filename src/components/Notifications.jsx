@@ -259,9 +259,9 @@ const Notifications = () => {
         <div className="d-flex flex-wrap gap-2 mt-2 mt-sm-0">
           <button
             onClick={() => setShowTestModal(true)}
-            className="btn btn-outline-success btn-sm d-flex align-items-center gap-1"
+            className="btn btn-success text-white fw-semibold btn-sm d-flex align-items-center gap-1 shadow-sm"
           >
-            <i className="bi bi-envelope-check"></i> Test Email
+            <i className="bi bi-envelope-check-fill"></i> Test Email
           </button>
           <button
             onClick={() => setShowSendModal(true)}

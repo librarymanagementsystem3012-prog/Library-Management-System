@@ -11,7 +11,7 @@ const Sidebar = () => {
     { name: 'Issue Book', path: '/issue-book', icon: 'bi-box-arrow-up-right' },
     { name: 'Return Book', path: '/return-book', icon: 'bi-box-arrow-in-down-left' },
     { name: 'Statistics', path: '/statistics', icon: 'bi-pie-chart-fill' },
-    { name: 'Notifications', path: '/notifications', icon: 'bi-bell-fill' }
+    { name: 'Notifications (Emails)', path: '/notifications', icon: 'bi-bell-fill' }
   ];
 
   return (

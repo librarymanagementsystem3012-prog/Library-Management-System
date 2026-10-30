@@ -61,6 +61,16 @@ const Navbar = ({ onLogout }) => {
           )}
         </div>
 
+        {/* Test Email Quick Shortcut */}
+        <Link
+          to="/notifications"
+          className="btn btn-outline-success btn-sm d-flex align-items-center gap-1"
+          title="Test Brevo / SMTP Email Dispatch"
+        >
+          <i className="bi bi-envelope-check"></i>
+          <span>Test Email</span>
+        </Link>
+
         {/* User Profile Badge */}
         <div className="nav-user-badge">
           <i className="bi bi-person-circle fs-5 text-primary"></i>
