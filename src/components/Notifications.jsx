@@ -257,7 +257,7 @@ const Notifications = () => {
               SMTP Status: {systemHealth?.emailConfigured ? 'Gmail SMTP Active (Live Delivery)' : 'Checking SMTP Status...'}
             </strong>
             <small className="text-muted">
-              Sender Account: <code>library.system1230@gmail.com</code> &bull; Real HTML receipts & reminders are delivered directly to student email inboxes.
+              Sender Account: <code>{systemHealth?.emailSender || 'library.system1230@gmail.com'}</code> &bull; Real HTML receipts & reminders are delivered directly to student email inboxes.
             </small>
           </div>
         </div>

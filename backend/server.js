@@ -63,7 +63,8 @@ app.get('/api/health', async (req, res) => {
       process.env.EMAIL_USER &&
       process.env.EMAIL_PASSWORD &&
       !process.env.EMAIL_USER.includes('your-email')
-    )
+    ),
+    emailSender: process.env.EMAIL_USER || null
   });
 });
 
