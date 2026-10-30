@@ -396,12 +396,13 @@ function executeSimulatedQuery(sql, params = []) {
   }
 
   // 4. ISSUES QUERIES
-  if (cleanSql.includes('FROM issues i') || lower.startsWith('select i.*')) {
+  if (lower.includes('from issues i') || lower.startsWith('select i.*')) {
     let list = fallbackStore.issues.map(iss => {
       const s = fallbackStore.students.find(x => x.id === iss.student_id) || {};
       const b = fallbackStore.books.find(x => x.id === iss.book_id) || {};
       return {
         ...iss,
+        issue_id: iss.id,
         student_name: s.student_name || 'Student',
         email: s.email || 'student@example.com',
         phone_number: s.phone_number || '',
@@ -411,14 +412,25 @@ function executeSimulatedQuery(sql, params = []) {
       };
     });
 
-    if (cleanSql.includes("i.status = 'Issued'") && !cleanSql.includes('curdate()')) {
-      list = list.filter(i => i.status === 'Issued');
-    }
-    if (cleanSql.includes("i.due_date < curdate()")) {
+    if (lower.includes('date_add') && lower.includes('interval 1 day')) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const todayStr = new Date().toISOString().split('T')[0];
+      list = list.filter(i => i.status === 'Issued' && (i.due_date === tomorrowStr || i.due_date === todayStr));
+    } else if (lower.includes('date_add') && lower.includes('interval 3 day')) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const maxDate = new Date();
+      maxDate.setDate(maxDate.getDate() + 3);
+      const maxStr = maxDate.toISOString().split('T')[0];
+      list = list.filter(i => i.status === 'Issued' && i.due_date >= todayStr && i.due_date <= maxStr);
+    } else if (lower.includes('due_date < curdate()')) {
       const today = new Date().toISOString().split('T')[0];
       list = list.filter(i => i.status === 'Issued' && i.due_date < today);
+    } else if (lower.includes("i.status = 'issued'")) {
+      list = list.filter(i => i.status === 'Issued');
     }
-    if (cleanSql.includes('where i.id = ?')) {
+    if (lower.includes('where i.id = ?')) {
       list = list.filter(i => i.id === Number(params[0]));
     }
     return [list];

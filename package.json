@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "node backend/server.js",
     "server": "node backend/server.js",
     "backend": "node --watch backend/server.js",
     "build": "vite build",
+    "postinstall": "npm --prefix backend install",
     "lint": "oxlint",
     "preview": "vite preview"
   },

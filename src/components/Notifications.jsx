@@ -6,6 +6,7 @@ import {
   triggerDueReminders,
   triggerOverdueReminders,
   sendEmail,
+  sendTestEmail,
   getStudents,
   checkHealth
 } from '../services/api';
@@ -44,6 +45,11 @@ const Notifications = () => {
 
   // Selected Notification details modal
   const [viewMessage, setViewMessage] = useState(null);
+
+  // Test Email Modal State
+  const [showTestModal, setShowTestModal] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [sendingTest, setSendingTest] = useState(false);
 
   const fetchNotificationData = async () => {
     try {
@@ -211,6 +217,34 @@ const Notifications = () => {
     }
   };
 
+  // Test Email Submit Handler
+  const handleSendTestEmail = async (e) => {
+    e.preventDefault();
+    if (!testEmailAddress.trim()) {
+      alert('Please enter a valid recipient email address');
+      return;
+    }
+
+    try {
+      setSendingTest(true);
+      const res = await sendTestEmail(testEmailAddress.trim());
+      setActionStatus({
+        type: 'success',
+        message: res.data?.message || 'Test email dispatched successfully! Please check your inbox / spam folder.'
+      });
+      setShowTestModal(false);
+      setTestEmailAddress('');
+      fetchNotificationData();
+    } catch (err) {
+      setActionStatus({
+        type: 'danger',
+        message: 'Test email failed: ' + (err.message || 'SMTP dispatch error')
+      });
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
   return (
     <div className="fade-in">
       {/* Header */}
@@ -218,11 +252,17 @@ const Notifications = () => {
         <div>
           <h2 className="fw-bold mb-1">Email Notifications & Reminder System</h2>
           <p className="text-muted mb-0">
-            Nodemailer Gmail SMTP dispatch history, due-date reminder automation, and delivery logs
+            Brevo SMTP dispatch history, automated due-date & overdue reminder system, and delivery logs
           </p>
         </div>
 
         <div className="d-flex flex-wrap gap-2 mt-2 mt-sm-0">
+          <button
+            onClick={() => setShowTestModal(true)}
+            className="btn btn-outline-success btn-sm d-flex align-items-center gap-1"
+          >
+            <i className="bi bi-envelope-check"></i> Test Email
+          </button>
           <button
             onClick={() => setShowSendModal(true)}
             className="btn btn-primary btn-sm d-flex align-items-center gap-1"
@@ -249,22 +289,25 @@ const Notifications = () => {
       {/* SMTP Connection Info Banner */}
       <div className="alert alert-light border shadow-sm p-3 mb-4 rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
         <div className="d-flex align-items-center gap-2">
-          <span className="badge bg-success p-2">
-            <i className="bi bi-shield-check fs-6"></i>
+          <span className={`badge ${systemHealth?.emailConfigured ? 'bg-success' : 'bg-warning text-dark'} p-2`}>
+            <i className={`bi ${systemHealth?.emailConfigured ? 'bi-shield-check' : 'bi-exclamation-circle'} fs-6`}></i>
           </span>
           <div>
             <strong className="d-block text-dark">
-              SMTP Status: {systemHealth?.emailConfigured ? 'Gmail SMTP Active (Live Delivery)' : 'Checking SMTP Status...'}
+              SMTP Status: {systemHealth?.emailConfigured ? 'Brevo / SMTP Active (Live Delivery)' : 'Simulation Mode (Configure Brevo SMTP in .env)'}
             </strong>
             <small className="text-muted">
-              Sender Account: <code>{systemHealth?.emailSender || 'library.system1230@gmail.com'}</code> &bull; Real HTML receipts & reminders are delivered directly to student email inboxes.
+              Host: <code>{systemHealth?.smtpHost || 'smtp-relay.brevo.com'}</code> &bull; Sender: <code>{systemHealth?.emailSender || 'Not configured'}</code> &bull; Real HTML receipts & reminders are delivered directly to student email inboxes.
             </small>
           </div>
         </div>
-        <div>
-          <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
-            <i className="bi bi-info-circle me-1"></i> Tip: Use real student emails in Student Manager to receive emails
-          </span>
+        <div className="d-flex align-items-center gap-2">
+          <button
+            onClick={() => setShowTestModal(true)}
+            className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+          >
+            <i className="bi bi-gear-wide-connected"></i> Verify SMTP
+          </button>
         </div>
       </div>
 
@@ -633,6 +676,85 @@ const Notifications = () => {
                       <>
                         <i className="bi bi-send-fill"></i>
                         Send Email Now
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Send Test Email */}
+      {showTestModal && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content custom-card border-0">
+              <div className="modal-header border-bottom bg-success-subtle">
+                <h5 className="modal-title fw-bold text-success-emphasis">
+                  <i className="bi bi-envelope-check me-2"></i>
+                  Send Brevo / SMTP Test Email
+                </h5>
+                <button type="button" className="btn-close" onClick={() => setShowTestModal(false)}></button>
+              </div>
+              <form onSubmit={handleSendTestEmail}>
+                <div className="modal-body p-4">
+                  <p className="text-muted small mb-3">
+                    Verify that your Brevo SMTP connection and credentials work by sending a live test email to any inbox you specify below.
+                  </p>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                      Recipient Email Address <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="e.g. your-email@gmail.com"
+                      value={testEmailAddress}
+                      onChange={(e) => setTestEmailAddress(e.target.value)}
+                      required
+                    />
+                    <small className="form-text text-muted">
+                      A formatted verification email will be dispatched to this address.
+                    </small>
+                  </div>
+
+                  <div className="bg-light p-3 rounded border small">
+                    <div className="d-flex justify-content-between mb-1">
+                      <span className="text-muted">Host:</span>
+                      <strong>{systemHealth?.smtpHost || 'smtp-relay.brevo.com'}</strong>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                      <span className="text-muted">Sender Account:</span>
+                      <strong>{systemHealth?.emailSender || 'Configured in .env'}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer border-top">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setShowTestModal(false)}
+                    disabled={sendingTest}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-success d-flex align-items-center gap-2"
+                    disabled={sendingTest}
+                  >
+                    {sendingTest ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm" role="status"></span>
+                        Dispatching Test Email...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-send-check"></i>
+                        Send Test Email
                       </>
                     )}
                   </button>

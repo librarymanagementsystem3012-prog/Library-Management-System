@@ -7,37 +7,44 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 dotenv.config();
 
-// Create reusable pooled transporter object using direct Gmail SSL
+// Create reusable pooled transporter object
 let cachedTransporter = null;
+let cachedConfigKey = null;
 
 function getTransporter() {
-  const user = process.env.EMAIL_USER;
-  let pass = process.env.EMAIL_PASSWORD;
+  const host = (process.env.SMTP_HOST || 'smtp-relay.brevo.com').trim();
+  const port = parseInt(process.env.SMTP_PORT || '587', 10);
+  const user = (process.env.EMAIL_USER || '').trim();
+  let pass = (process.env.EMAIL_PASSWORD || '').trim();
 
-  if (!user || !pass || user.includes('your-email') || pass.includes('your-gmail')) {
+  if (!user || !pass || user.includes('your-email') || user.includes('example.com') || pass.includes('your-brevo') || pass.includes('your-gmail')) {
     return null;
   }
 
-  if (cachedTransporter) {
+  const currentConfigKey = `${host}:${port}:${user}:${pass}`;
+  if (cachedTransporter && cachedConfigKey === currentConfigKey) {
     return cachedTransporter;
   }
 
-  // Strip all whitespace from Gmail app passwords (e.g. "cqlx sxzo yang mfvo" -> "cqlxsxzoyangmfvo")
-  pass = pass.replace(/\s+/g, '').trim();
+  const isSecure = process.env.SMTP_SECURE === 'true' || port === 465;
 
   cachedTransporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    host: host,
+    port: port,
+    secure: isSecure,
     pool: true,
     maxConnections: 5,
     maxMessages: 100,
     auth: {
-      user: user.trim(),
+      user: user,
       pass: pass
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 
+  cachedConfigKey = currentConfigKey;
   return cachedTransporter;
 }
 
@@ -107,7 +114,7 @@ async function sendMail({ to, subject, text, html = null, type = 'General', stud
   const transporter = getTransporter();
 
   if (!transporter) {
-    console.warn(`[Email Simulation] Nodemailer not configured with real Gmail credentials in .env. Email to <${to}>: "${subject}"`);
+    console.warn(`[Email Simulation] SMTP not configured with real credentials in .env. Email to <${to}>: "${subject}"`);
     await logNotification({
       studentId,
       issueId,
@@ -120,13 +127,14 @@ async function sendMail({ to, subject, text, html = null, type = 'General', stud
     return {
       success: true,
       simulated: true,
-      message: 'Email logged in simulation mode. Configure EMAIL_USER and EMAIL_PASSWORD in .env for real Gmail dispatch.'
+      message: 'Email logged in simulation mode. Configure SMTP credentials in .env for real dispatch.'
     };
   }
 
   try {
+    const sender = process.env.EMAIL_FROM || `"Library Management System" <${process.env.EMAIL_USER.trim()}>`;
     const mailOptions = {
-      from: `"Library Management System" <${process.env.EMAIL_USER.trim()}>`,
+      from: sender,
       to: to.trim(),
       subject,
       text,
@@ -363,13 +371,14 @@ Library Management System`;
 // 5. Test Email
 async function sendTestEmail(toEmail) {
   const timestamp = new Date().toLocaleString();
-  const subject = `Library Management System - Gmail SMTP Test Email`;
+  const subject = `Library Management System - SMTP Test Email`;
   const text = `Dear User,
 
 This is a live test email from the Library Management System.
-If you are reading this in your inbox, your Nodemailer Gmail SMTP integration is active and working perfectly!
+If you are reading this in your inbox, your Brevo / SMTP integration is active and working perfectly!
 
-Configured Sender: ${process.env.EMAIL_USER || 'N/A'}
+Configured Host: ${process.env.SMTP_HOST || 'smtp-relay.brevo.com'}
+Configured Sender: ${process.env.EMAIL_FROM || process.env.EMAIL_USER || 'N/A'}
 Recipient: ${toEmail}
 Timestamp: ${timestamp}
 
@@ -384,17 +393,18 @@ Library Management System`;
     contentHtml: `
       <p>Hello,</p>
       <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:16px; margin:16px 0;">
-        <h3 style="margin:0 0 8px 0; color:#065f46; font-size:16px;">🎉 Gmail SMTP Verification Successful!</h3>
-        <p style="margin:0; font-size:14px; color:#047857;">Your Library Management System is connected to Gmail SMTP via Nodemailer and can deliver real emails directly to students' inboxes.</p>
+        <h3 style="margin:0 0 8px 0; color:#065f46; font-size:16px;">🎉 Brevo SMTP Verification Successful!</h3>
+        <p style="margin:0; font-size:14px; color:#047857;">Your Library Management System is connected to Brevo SMTP via Nodemailer and can deliver real emails directly to students' inboxes.</p>
       </div>
       
       <table style="width:100%; border-collapse:collapse; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; margin:16px 0;">
-        <tr><td style="padding:10px 14px; color:#64748b; font-size:14px; border-bottom:1px solid #edf2f7;">Sender Account</td><td style="padding:10px 14px; font-weight:600; color:#0f172a; font-size:14px; border-bottom:1px solid #edf2f7;">${process.env.EMAIL_USER || 'N/A'}</td></tr>
+        <tr><td style="padding:10px 14px; color:#64748b; font-size:14px; border-bottom:1px solid #edf2f7;">SMTP Host</td><td style="padding:10px 14px; font-weight:600; color:#0f172a; font-size:14px; border-bottom:1px solid #edf2f7;">${process.env.SMTP_HOST || 'smtp-relay.brevo.com'}</td></tr>
+        <tr><td style="padding:10px 14px; color:#64748b; font-size:14px; border-bottom:1px solid #edf2f7;">Sender Account</td><td style="padding:10px 14px; font-weight:600; color:#0f172a; font-size:14px; border-bottom:1px solid #edf2f7;">${process.env.EMAIL_FROM || process.env.EMAIL_USER || 'N/A'}</td></tr>
         <tr><td style="padding:10px 14px; color:#64748b; font-size:14px; border-bottom:1px solid #edf2f7;">Recipient</td><td style="padding:10px 14px; font-weight:600; color:#0f172a; font-size:14px; border-bottom:1px solid #edf2f7;">${toEmail}</td></tr>
         <tr><td style="padding:10px 14px; color:#64748b; font-size:14px;">Dispatch Timestamp</td><td style="padding:10px 14px; font-weight:600; color:#0f172a; font-size:14px;">${timestamp}</td></tr>
       </table>
 
-      <p style="font-size:14px; color:#475569;">All automated reminders (book issue receipts, return confirmations, due date alerts, overdue penalty notices) will now reach real recipient email addresses.</p>
+      <p style="font-size:14px; color:#475569;">All automated notifications (book issue receipts, return confirmations, due date alerts, overdue penalty notices) will now reach real recipient email addresses.</p>
     `
   });
 
